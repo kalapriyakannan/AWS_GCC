@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fastest Finger First Challenge</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f3; color: #1a1a18; min-height: 100vh; }
+
+.hero { background: #1a1a18; color: #fff; padding: 3rem 2rem 2.5rem; text-align: center; }
+.hero-eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #888; margin-bottom: 12px; }
+.hero h1 { font-size: 28px; font-weight: 500; margin-bottom: 10px; line-height: 1.3; }
+.hero p { font-size: 14px; color: #aaa; max-width: 520px; margin: 0 auto; line-height: 1.7; }
+.hero-badge { display: inline-flex; align-items: center; gap: 6px; background: #2a2a28; border: 0.5px solid #444; border-radius: 20px; padding: 5px 14px; font-size: 11px; color: #aaa; margin-bottom: 1.5rem; }
+
+.content { max-width: 860px; margin: 0 auto; padding: 2.5rem 2rem; }
+
+.section-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: #aaa; font-weight: 500; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px; }
+.section-label::after { content: ''; flex: 1; height: 0.5px; background: #eee; }
+
+.cards { display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 2.5rem; }
+
+.activity-card { background: #fff; border: 0.5px solid #ddd; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; transition: box-shadow 0.15s, border-color 0.15s; }
+.activity-card:hover { border-color: #bbb; }
+.card-accent { height: 3px; }
+.card-body { padding: 1.5rem; flex: 1; }
+.card-header { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 14px; }
+.card-icon { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.card-meta { flex: 1; }
+.card-num { font-size: 10px; font-weight: 500; color: #bbb; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; }
+.card-title { font-size: 16px; font-weight: 500; color: #1a1a18; line-height: 1.3; }
+.card-desc { font-size: 13px; color: #666; line-height: 1.65; margin-bottom: 16px; }
+.card-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+.tag { font-size: 11px; padding: 3px 9px; border-radius: 20px; border: 0.5px solid #eee; color: #888; }
+.card-footer { padding: 1rem 1.5rem; border-top: 0.5px solid #f0f0ee; display: flex; align-items: center; justify-content: space-between; }
+.card-time { font-size: 12px; color: #aaa; display: flex; align-items: center; gap: 5px; }
+.launch-btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 18px; border-radius: 8px; font-size: 13px; font-weight: 500; text-decoration: none; font-family: inherit; cursor: pointer; border: none; transition: opacity 0.15s; }
+.launch-btn:hover { opacity: 0.85; }
+
+.divider-row { border: none; border-top: 0.5px solid #eee; margin: 2rem 0; }
+
+.about { background: #fff; border: 0.5px solid #ddd; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; }
+.about h2 { font-size: 15px; font-weight: 500; margin-bottom: 10px; }
+.about p { font-size: 13px; color: #666; line-height: 1.7; margin-bottom: 8px; }
+.about p:last-child { margin-bottom: 0; }
+
+.how-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 2rem; }
+.how-card { background: #fff; border: 0.5px solid #ddd; border-radius: 10px; padding: 1rem 1.25rem; }
+.how-num { font-size: 22px; font-weight: 500; color: #eee; margin-bottom: 6px; }
+.how-title { font-size: 13px; font-weight: 500; color: #1a1a18; margin-bottom: 4px; }
+.how-desc { font-size: 12px; color: #888; line-height: 1.5; }
+
+.footer { text-align: center; padding: 1.5rem 2rem; border-top: 0.5px solid #eee; font-size: 12px; color: #bbb; }
+
+/* Accent colors per activity */
+.acc-purple { background: linear-gradient(90deg, #7f77dd, #534ab7); }
+.acc-teal { background: linear-gradient(90deg, #1d9e75, #0f6e56); }
+.acc-blue { background: linear-gradient(90deg, #378add, #185fa5); }
+.icon-purple { background: #eeedfe; color: #534ab7; }
+.icon-teal { background: #e1f5ee; color: #0f6e56; }
+.icon-blue { background: #e6f1fb; color: #185fa5; }
+.btn-purple { background: #534ab7; color: #fff; }
+.btn-teal { background: #0f6e56; color: #fff; }
+.btn-blue { background: #185fa5; color: #fff; }
+
+@media (max-width: 600px) {
+  .how-row { grid-template-columns: 1fr; }
+  .hero h1 { font-size: 22px; }
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-badge"><i class="ti ti-compass" style="font-size:12px;"></i> Executive Workshop Series</div>
+  <h1>Fastest Finger First Challenge</h1>
+  <p>Three hands-on activities that put you in the shoes of someone searching for the right answer — across distributed systems, tools, and data.</p>
+</div>
+
+<div class="content">
+
+  <div class="section-label"><i class="ti ti-layout-grid" style="font-size:12px;"></i> Choose an activity</div>
+
+  <div class="cards">
+
+    <!-- Activity 1 -->
+    <div class="activity-card">
+      <div class="card-accent acc-purple"></div>
+      <div class="card-body">
+        <div class="card-header">
+          <div class="card-icon icon-purple"><i class="ti ti-book"></i></div>
+          <div class="card-meta">
+            <div class="card-num">Activity 01</div>
+            <div class="card-title">Paradox of Distributed Knowledge</div>
+          </div>
+        </div>
+        <div class="card-desc">Navigate three separate artifacts — an engineering Wiki, a GitHub repository with live code, and a Google Doc — to answer two questions about a real project. No single artifact has the full picture. You have to piece it together.</div>
+        <div class="card-tags">
+          <span class="tag"><i class="ti ti-book" style="font-size:10px; vertical-align:-1px;"></i> Wiki</span>
+          <span class="tag"><i class="ti ti-brand-github" style="font-size:10px; vertical-align:-1px;"></i> GitHub</span>
+          <span class="tag"><i class="ti ti-file-description" style="font-size:10px; vertical-align:-1px;"></i> Google Doc</span>
+          <span class="tag">Cross-artifact reasoning</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span class="card-time"><i class="ti ti-clock" style="font-size:13px;"></i> 5–8 min</span>
+        <a href="exec_discovery_activity.html" class="launch-btn btn-purple">Start activity <i class="ti ti-arrow-right" style="font-size:13px;"></i></a>
+      </div>
+    </div>
+
+    <!-- Activity 2 -->
+    <div class="activity-card">
+      <div class="card-accent acc-teal"></div>
+      <div class="card-body">
+        <div class="card-header">
+          <div class="card-icon icon-teal"><i class="ti ti-sitemap"></i></div>
+          <div class="card-meta">
+            <div class="card-num">Activity 02</div>
+            <div class="card-title">Skills Compass</div>
+          </div>
+        </div>
+        <div class="card-desc">You have 10 AI skills, each doing one specific thing. Given a real-world job to be done, identify which skills — in which order — complete the workflow. Two scenarios of increasing complexity. Can you find the right sequence?</div>
+        <div class="card-tags">
+          <span class="tag">10 skills catalog</span>
+          <span class="tag">Workflow sequencing</span>
+          <span class="tag">2 scenarios</span>
+          <span class="tag">Interactive</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span class="card-time"><i class="ti ti-clock" style="font-size:13px;"></i> 8–12 min</span>
+        <a href="skills_discovery_activity.html" class="launch-btn btn-teal">Start activity <i class="ti ti-arrow-right" style="font-size:13px;"></i></a>
+      </div>
+    </div>
+
+    <!-- Activity 3 -->
+    <div class="activity-card">
+      <div class="card-accent acc-blue"></div>
+      <div class="card-body">
+        <div class="card-header">
+          <div class="card-icon icon-blue"><i class="ti ti-table"></i></div>
+          <div class="card-meta">
+            <div class="card-num">Activity 03</div>
+            <div class="card-title">Data Insights Challenge</div>
+          </div>
+        </div>
+        <div class="card-desc">Three business data tables: quarterly revenue, support metrics, and team headcount. Six questions phrased in plain English — from simple lookups to multi-table cross-referencing. Find the insight hiding in the numbers.</div>
+        <div class="card-tags">
+          <span class="tag">3 data tables</span>
+          <span class="tag">6 questions</span>
+          <span class="tag">Easy → Hard</span>
+          <span class="tag">Scored</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <span class="card-time"><i class="ti ti-clock" style="font-size:13px;"></i> 10–15 min</span>
+        <a href="data_insights_activity.html" class="launch-btn btn-blue">Start activity <i class="ti ti-arrow-right" style="font-size:13px;"></i></a>
+      </div>
+    </div>
+
+  </div>
+
+  <hr class="divider-row">
+
+  <div class="section-label"><i class="ti ti-info-circle" style="font-size:12px;"></i> About this workshop</div>
+
+  <div class="about">
+    <h2>The Discover challenge</h2>
+    <p>Each activity is designed around a single pain point that slows down decision-making in modern organisations: <strong>Discover</strong> — the difficulty of finding the right information, tool, or insight when knowledge is spread across systems, formats, and teams.</p>
+    <p>After each activity, a debrief prompt connects the experience back to your organisation. The goal is not just to complete the task — it's to feel the friction, and ask: <em>how much of our day is spent discovering rather than deciding?</em></p>
+  </div>
+
+  <div class="section-label"><i class="ti ti-list-check" style="font-size:12px;"></i> How to run this at your conference</div>
+
+  <div class="how-row">
+    <div class="how-card">
+      <div class="how-num">01</div>
+      <div class="how-title">Share this page</div>
+      <div class="how-desc">Put the URL on a slide or QR code. Participants open it on their own device — laptop or phone.</div>
+    </div>
+    <div class="how-card">
+      <div class="how-num">02</div>
+      <div class="how-title">Pick an activity</div>
+      <div class="how-desc">Run one activity per session (5–15 min each), or let the group self-select based on their role.</div>
+    </div>
+    <div class="how-card">
+      <div class="how-num">03</div>
+      <div class="how-title">Debrief together</div>
+      <div class="how-desc">Use the prompt at the bottom of each activity to open a group discussion about discovery friction in your org.</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  Built for executive workshops · All data and scenarios are illustrative
+</div>
+
+</script>
+</body>
+</html>
