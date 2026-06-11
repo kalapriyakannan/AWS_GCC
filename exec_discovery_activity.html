@@ -59,7 +59,16 @@ p { font-size: 13px; color: #555; line-height: 1.6; margin-bottom: 8px; }
 .endpoint { font-family: 'Menlo', 'Consolas', monospace; font-size: 12px; color: #1a1a18; flex: 1; }
 .owner { font-size: 11px; color: #aaa; }
 .notice { background: #faeeda; border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #854f0b; display: flex; align-items: flex-start; gap: 8px; margin-bottom: 1rem; }
-.answer-box { margin-top: 12px; padding: 10px 12px; background: #f5f5f3; border-radius: 8px; font-size: 12px; color: #aaa; font-style: italic; min-height: 48px; }
+.answer-box { margin-top: 12px; width: 100%; padding: 10px 12px; background: #f5f5f3; border-radius: 8px; font-size: 13px; color: #1a1a18; min-height: 80px; border: 0.5px solid #ddd; font-family: inherit; resize: vertical; line-height: 1.6; display: block; }
+.answer-box:focus { outline: none; border-color: #534ab7; background: #fff; box-shadow: 0 0 0 2px #eeedfe; }
+.answer-box::placeholder { color: #aaa; font-style: italic; }
+.answer-actions { display: flex; gap: 8px; margin-top: 8px; align-items: center; }
+.btn-reveal { padding: 7px 14px; border-radius: 7px; font-size: 12px; font-weight: 500; cursor: pointer; border: 0.5px solid #ddd; background: #fff; color: #555; font-family: inherit; transition: background 0.15s; display: flex; align-items: center; gap: 5px; }
+.btn-reveal:hover { background: #f5f5f3; }
+.btn-reveal.shown { background: #eeedfe; border-color: #c7c4f5; color: #534ab7; }
+.answer-reveal { margin-top: 10px; display: none; background: #e1f5ee; border: 0.5px solid #b3ddd0; border-radius: 8px; padding: 12px 14px; font-size: 13px; color: #0f4a38; line-height: 1.65; }
+.answer-reveal.visible { display: block; }
+.answer-reveal .reveal-label { font-size: 10px; font-weight: 600; color: #0f6e56; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 6px; display: flex; align-items: center; gap: 5px; }
 .debrief { background: #fff; border-left: 2px solid #e9a800; border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin-top: 1rem; }
 </style>
 </head>
@@ -301,7 +310,14 @@ module.exports = { auth };
       <span class="hint-chip"><i class="ti ti-brand-github" style="font-size:12px;"></i> GitHub → metricsRoutes.js</span>
       <span class="hint-chip"><i class="ti ti-file-description" style="font-size:12px;"></i> Google Doc → Users</span>
     </div>
-    <div class="answer-box">Write your answer here or discuss with your group. Note which artifact(s) you used.</div>
+    <textarea class="answer-box" id="ans1" placeholder="Write your answer here or discuss with your group. Note which artifact(s) you used."></textarea>
+    <div class="answer-actions">
+      <button class="btn-reveal" id="rev1btn" onclick="toggleReveal('rev1','rev1btn')"><i class="ti ti-eye" style="font-size:13px;"></i> Reveal answer</button>
+    </div>
+    <div class="answer-reveal" id="rev1">
+      <div class="reveal-label"><i class="ti ti-circle-check" style="font-size:13px;"></i> Model answer</div>
+      <p style="margin:0; color:#0f4a38;"><strong style="font-weight:500;">Endpoint owner:</strong> Priya S. owns <code style="font-family:monospace; background:#cef0e2; padding:1px 5px; border-radius:4px;">GET /api/metrics</code> (visible in the GitHub README and metricsRoutes.js).<br><br><strong style="font-weight:500;">Wait time:</strong> 4–6 business days. New users request access via the IT portal — there is no self-serve sign-up (Google Doc → Users &amp; access section).<br><br><em style="font-size:12px; color:#3b7a62;">Sources used: GitHub (README + metricsRoutes.js) and Google Doc (Users &amp; access).</em></p>
+    </div>
   </div>
 
   <div class="q-card">
@@ -312,7 +328,14 @@ module.exports = { auth };
       <span class="hint-chip"><i class="ti ti-brand-github" style="font-size:12px;"></i> GitHub → metricsRoutes.js</span>
       <span class="hint-chip"><i class="ti ti-file-description" style="font-size:12px;"></i> Google Doc → Known issues + Team</span>
     </div>
-    <div class="answer-box">Write your answer here or discuss with your group. Note which artifact(s) you used.</div>
+    <textarea class="answer-box" id="ans2" placeholder="Write your answer here or discuss with your group. Note which artifact(s) you used."></textarea>
+    <div class="answer-actions">
+      <button class="btn-reveal" id="rev2btn" onclick="toggleReveal('rev2','rev2btn')"><i class="ti ti-eye" style="font-size:13px;"></i> Reveal answer</button>
+    </div>
+    <div class="answer-reveal" id="rev2">
+      <div class="reveal-label"><i class="ti ti-circle-check" style="font-size:13px;"></i> Model answer</div>
+      <p style="margin:0; color:#0f4a38;"><strong style="font-weight:500;">Root cause:</strong> The Redis cache is not invalidated when source data is updated mid-day. Users can therefore see stale metrics for up to 5 minutes after an update (visible in the Wiki "Known issues" notice and confirmed in metricsRoutes.js line 12 — <code style="font-family:monospace; background:#cef0e2; padding:1px 5px; border-radius:4px;">ttl: 300</code> with no invalidation hook).<br><br><strong style="font-weight:500;">Engineer to fix it:</strong> Priya S. — Tech lead for API &amp; backend (Google Doc → Team section).<br><br><em style="font-size:12px; color:#3b7a62;">Sources used: Wiki (Known issues), GitHub (metricsRoutes.js), and Google Doc (Team + Known issues).</em></p>
+    </div>
   </div>
 
   <hr class="divider">
@@ -334,6 +357,20 @@ function showTab(id, btn) {
 function showCode(name) {
   document.querySelectorAll('.code-block').forEach(b => b.classList.remove('visible'));
   document.getElementById('code-' + name).classList.add('visible');
+}
+function toggleReveal(panelId, btnId) {
+  const panel = document.getElementById(panelId);
+  const btn = document.getElementById(btnId);
+  const isVisible = panel.classList.contains('visible');
+  if (isVisible) {
+    panel.classList.remove('visible');
+    btn.classList.remove('shown');
+    btn.innerHTML = '<i class="ti ti-eye" style="font-size:13px;"></i> Reveal answer';
+  } else {
+    panel.classList.add('visible');
+    btn.classList.add('shown');
+    btn.innerHTML = '<i class="ti ti-eye-off" style="font-size:13px;"></i> Hide answer';
+  }
 }
 </script>
 </body>
