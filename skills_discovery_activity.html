@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skills Compass — Discovery Activity</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f3; color: #1a1a18; padding: 2rem; }
+.shell { max-width: 760px; margin: 0 auto; background: #fff; border-radius: 12px; padding: 1.5rem 2rem 2rem; border: 0.5px solid #ddd; }
+h1 { font-size: 20px; font-weight: 500; color: #1a1a18; margin-bottom: 4px; }
+h3 { font-size: 13px; font-weight: 500; color: #1a1a18; margin-bottom: 4px; }
+p { font-size: 13px; color: #555; line-height: 1.6; }
+.top-bar { display: flex; gap: 0; border-bottom: 0.5px solid #ddd; margin-bottom: 1.5rem; }
+.tab { padding: 10px 18px; font-size: 13px; cursor: pointer; border-bottom: 2px solid transparent; color: #888; background: none; border-top: none; border-left: none; border-right: none; font-family: inherit; display: flex; align-items: center; gap: 6px; }
+.tab.active { color: #1a1a18; border-bottom: 2px solid #1a1a18; font-weight: 500; }
+.tab:hover:not(.active) { color: #1a1a18; background: #f5f5f3; }
+.page { display: none; }
+.page.active { display: block; }
+.section-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #aaa; font-weight: 500; margin-bottom: 10px; }
+
+/* Catalog */
+.skills-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.skill-card { background: #fff; border: 0.5px solid #ddd; border-radius: 10px; padding: 12px 14px; display: flex; gap: 12px; align-items: flex-start; }
+.skill-icon { width: 34px; height: 34px; border-radius: 8px; background: #f5f5f3; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 15px; color: #555; }
+.skill-num { font-size: 10px; font-weight: 500; color: #bbb; margin-bottom: 3px; }
+.skill-name { font-size: 13px; font-weight: 500; color: #1a1a18; margin-bottom: 3px; }
+.skill-desc { font-size: 12px; color: #888; line-height: 1.5; }
+
+/* Scenario switcher */
+.scenario-switcher { display: flex; gap: 8px; margin-bottom: 1.25rem; flex-wrap: wrap; }
+.scenario-pill { padding: 7px 14px; font-size: 12px; cursor: pointer; border-radius: 20px; border: 0.5px solid #ddd; color: #888; background: none; font-family: inherit; display: flex; align-items: center; gap: 6px; }
+.scenario-pill.active { background: #1a1a18; color: #fff; border-color: #1a1a18; font-weight: 500; }
+
+/* Story */
+.story-card { border-left: 3px solid #e9a800; background: #fffdf5; border-radius: 0 10px 10px 0; padding: 14px 16px; margin-bottom: 1.25rem; }
+.story-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #854f0b; font-weight: 500; margin-bottom: 6px; }
+.story-text { font-size: 14px; color: #333; line-height: 1.65; }
+
+/* Instruction bar */
+.instr-bar { font-size: 13px; color: #555; margin-bottom: 10px; min-height: 20px; }
+
+/* Step slots */
+.slots-row { display: flex; gap: 8px; margin-bottom: 1.25rem; align-items: stretch; }
+.step-slot { flex: 1; border: 1.5px dashed #ddd; border-radius: 10px; padding: 12px 13px; cursor: pointer; transition: border-color 0.15s, background 0.15s; min-height: 82px; display: flex; flex-direction: column; gap: 6px; }
+.step-slot.ready { border-color: #185fa5; background: #f0f7ff; }
+.step-slot.filled { border: 1.5px solid #3b6d11; background: #f4fae9; }
+.step-slot:hover.ready { background: #e3f0fb; }
+.slot-num { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: #bbb; font-weight: 500; }
+.slot-label { font-size: 11px; color: #888; }
+.slot-empty { font-size: 12px; color: #ccc; font-style: italic; }
+.slot-ready-hint { font-size: 12px; color: #185fa5; font-style: italic; }
+.slot-placed { font-size: 13px; font-weight: 500; color: #3b6d11; display: flex; align-items: center; gap: 6px; }
+.slot-remove-hint { font-size: 10px; color: #aaa; font-weight: 400; font-style: italic; }
+.arrow-sep { font-size: 16px; color: #ddd; align-self: center; flex-shrink: 0; }
+
+/* Picker chips */
+.picker-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 1.25rem; }
+.skill-chip { padding: 8px 12px; font-size: 12px; border: 0.5px solid #ddd; border-radius: 8px; background: #fff; cursor: pointer; display: flex; align-items: center; gap: 7px; color: #1a1a18; font-family: inherit; transition: border-color 0.15s, background 0.15s; text-align: left; }
+.skill-chip:hover { background: #f5f5f3; border-color: #bbb; }
+.skill-chip.selected { border: 1.5px solid #185fa5; background: #e6f1fb; color: #185fa5; font-weight: 500; }
+.skill-chip.placed { opacity: 0.35; pointer-events: none; cursor: default; }
+
+/* Actions */
+.action-row { display: flex; gap: 8px; margin-bottom: 1.25rem; flex-wrap: wrap; }
+.btn { padding: 9px 16px; font-size: 13px; border-radius: 8px; border: 0.5px solid #ddd; cursor: pointer; font-family: inherit; background: #fff; color: #555; display: flex; align-items: center; gap: 6px; }
+.btn:hover { background: #f5f5f3; }
+.btn-primary { background: #1a1a18; color: #fff; border-color: #1a1a18; }
+.btn-primary:hover { background: #333; }
+.btn-ghost { color: #a32d2d; border-color: #f0c0b0; }
+.btn-ghost:hover { background: #fff5f5; }
+
+/* Result */
+.result-card { border-radius: 10px; padding: 14px 16px; display: none; margin-bottom: 1rem; }
+.result-card.show { display: block; }
+.res-title { font-size: 14px; font-weight: 500; margin-bottom: 8px; display: flex; align-items: center; gap: 7px; }
+.res-body { font-size: 13px; color: #555; line-height: 1.6; margin-bottom: 10px; }
+.res-step { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; margin-bottom: 6px; color: #555; }
+.res-step:last-child { margin-bottom: 0; }
+.step-badge { font-size: 11px; font-weight: 500; padding: 2px 7px; border-radius: 4px; flex-shrink: 0; margin-top: 1px; }
+.res-correct { background: #eaf3de; border: 0.5px solid #c0dd97; }
+.res-correct .res-title { color: #3b6d11; }
+.res-correct .step-badge { background: #3b6d11; color: #fff; }
+.res-wrong { background: #faeeda; border: 0.5px solid #fac775; }
+.res-wrong .res-title { color: #854f0b; }
+.res-reveal { background: #f5f5f3; border: 0.5px solid #ddd; }
+.res-reveal .res-title { color: #1a1a18; }
+.res-reveal .step-badge { background: #1a1a18; color: #fff; }
+
+/* Debrief */
+.debrief { border-left: 2px solid #e9a800; border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; background: #fffdf5; }
+.debrief-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #854f0b; font-weight: 500; margin-bottom: 6px; display: flex; align-items: center; gap: 5px; }
+.debrief p { color: #854f0b; font-size: 13px; line-height: 1.65; }
+</style>
+</head>
+<body>
+<div class="shell">
+
+<div style="margin-bottom: 1.25rem;">
+  <h1>Skills Compass</h1>
+  <p style="color:#888; margin-top:4px;">10 skills. Two workflows. Identify the right skills — in the right order — to get the job done.</p>
+</div>
+
+<div class="top-bar">
+  <button class="tab active" onclick="showTab('catalog', this)"><i class="ti ti-layout-grid"></i> Skills Catalog</button>
+  <button class="tab" onclick="showTab('workflow', this)"><i class="ti ti-sitemap"></i> Workflow Challenge</button>
+</div>
+
+<div id="catalog" class="page active">
+  <div class="section-label" style="margin-bottom:14px;">10 available skills — study these before taking the challenge</div>
+  <div class="skills-grid" id="catalog-grid"></div>
+</div>
+
+<div id="workflow" class="page">
+  <div class="scenario-switcher">
+    <button class="scenario-pill active" onclick="switchScenario('A', this)"><i class="ti ti-clipboard-check"></i> Scenario A — Post-meeting deliverable</button>
+    <button class="scenario-pill" onclick="switchScenario('B', this)"><i class="ti ti-user-plus"></i> Scenario B — New hire fast-track</button>
+  </div>
+  <div class="story-card">
+    <div class="story-label">The situation</div>
+    <div class="story-text" id="story-text"></div>
+  </div>
+  <div class="instr-bar" id="instr-bar"></div>
+  <div class="slots-row" id="slots-row"></div>
+  <div class="section-label">Available skills — click to select, then click a step slot above to place</div>
+  <div class="picker-grid" id="picker-grid"></div>
+  <div class="action-row">
+    <button class="btn btn-ghost" onclick="clearAll()"><i class="ti ti-refresh"></i> Clear all</button>
+    <button class="btn btn-primary" onclick="checkAnswer()"><i class="ti ti-check"></i> Check answer</button>
+    <button class="btn" onclick="revealAnswer()"><i class="ti ti-eye"></i> Reveal answer</button>
+  </div>
+  <div class="result-card" id="result-card"></div>
+  <div class="debrief">
+    <div class="debrief-label"><i class="ti ti-bulb" style="font-size:14px;"></i> Debrief prompt</div>
+    <p>You just experienced the <strong>Discover</strong> challenge. With 10 skills available, finding the right combination — and the right sequence — means carefully reading every description. In your organisation, how would you help a colleague find the right skill or tool for their specific job to be done?</p>
+  </div>
+</div>
+
+</div>
+<script>
+const SKILLS = [
+  { id: 'meeting-recap',     icon: 'ti-video',          name: 'Meeting Recap',        desc: 'Summarises a recorded Zoom meeting — TL;DR, decisions, and timestamped action items.' },
+  { id: 'start-my-day',      icon: 'ti-sun',             name: 'Start My Day',         desc: 'Scans calendar, email, Slack, and Jira each morning and surfaces the day\'s top priorities.' },
+  { id: 'search',            icon: 'ti-search',          name: 'Enterprise Search',    desc: 'Searches Confluence, GitHub, HR docs, policies, and the people directory in one query.' },
+  { id: 'personal-assistant',icon: 'ti-user-check',      name: 'Personal Assistant',   desc: 'Live dashboard of open Jira tickets assigned to you and your @mentions in Slack.' },
+  { id: 'meeting-prep',      icon: 'ti-clipboard-list',  name: 'Meeting Prep',         desc: 'Pulls calendar context, recent emails, Drive docs, and Slack threads into a pre-meeting brief.' },
+  { id: 'pptx',              icon: 'ti-presentation',    name: 'Slide Deck Builder',   desc: 'Creates, edits, or extracts content from PowerPoint (.pptx) files.' },
+  { id: 'docx',              icon: 'ti-file-text',       name: 'Word Doc Writer',      desc: 'Generates or updates Word documents with headings, tables, and professional formatting.' },
+  { id: 'xlsx',              icon: 'ti-table',           name: 'Spreadsheet Builder',  desc: 'Builds or modifies Excel files with formulas, charts, and structured data tables.' },
+  { id: 'learn',             icon: 'ti-school',          name: 'Learning Path',        desc: 'Builds a personalised upskilling plan and finds bite-sized courses for any topic or tool.' },
+  { id: 'schedule',          icon: 'ti-calendar-time',   name: 'Scheduler',            desc: 'Creates recurring or one-time automated tasks — daily, weekly, or at a specific future time.' },
+];
+
+const SCENARIOS = {
+  A: {
+    story: 'The Head of Product just wrapped a 2-hour strategy session. She needs to share a polished slide deck of key decisions with the board by EOD — and wants every future strategy session to automatically produce the same output, without manual effort each time.',
+    steps: 3,
+    stepLabels: ['Capture what was decided', 'Create the board deliverable', 'Never do this manually again'],
+    answer: ['meeting-recap', 'pptx', 'schedule'],
+    explanation: [
+      '<strong>Meeting Recap</strong> — extracts the TL;DR, key decisions, and action items from the recorded strategy session with timestamps.',
+      '<strong>Slide Deck Builder</strong> — converts the structured recap into a polished board-ready PowerPoint presentation.',
+      '<strong>Scheduler</strong> — automates the entire flow so it triggers automatically after every future strategy session.'
+    ]
+  },
+  B: {
+    story: 'A senior manager wants to fast-track a new hire\'s first week. She needs to surface all the onboarding docs and policies scattered across the company wiki — then set the new hire up with a personalised daily briefing that runs every morning automatically, starting tomorrow.',
+    steps: 2,
+    stepLabels: ['Find everything they need to read', 'Set them up for every morning'],
+    answer: ['search', 'start-my-day'],
+    explanation: [
+      '<strong>Enterprise Search</strong> — finds scattered onboarding docs, policies, and wiki pages across all company knowledge bases in a single query.',
+      '<strong>Start My Day</strong> — creates the new hire\'s personalised daily briefing from calendar, Jira, Slack, and email — running automatically each morning.'
+    ]
+  }
+};
+
+let currentScenario = 'A';
+let selectedSkill = null;
+let slots = { A: [null, null, null], B: [null, null] };
+
+function showTab(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function switchScenario(id, btn) {
+  currentScenario = id;
+  selectedSkill = null;
+  document.querySelectorAll('.scenario-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  hideResult();
+  renderWorkflow();
+}
+
+function selectSkill(skillId) {
+  const s = slots[currentScenario];
+  const idx = s.indexOf(skillId);
+  if (idx !== -1) {
+    s[idx] = null;
+    selectedSkill = skillId;
+  } else if (selectedSkill === skillId) {
+    selectedSkill = null;
+  } else {
+    selectedSkill = skillId;
+  }
+  hideResult();
+  renderWorkflow();
+}
+
+function placeInSlot(slotIndex) {
+  if (!selectedSkill) {
+    if (slots[currentScenario][slotIndex]) {
+      slots[currentScenario][slotIndex] = null;
+      hideResult();
+      renderWorkflow();
+    }
+    return;
+  }
+  slots[currentScenario][slotIndex] = selectedSkill;
+  selectedSkill = null;
+  hideResult();
+  renderWorkflow();
+}
+
+function clearAll() {
+  const n = SCENARIOS[currentScenario].steps;
+  slots[currentScenario] = new Array(n).fill(null);
+  selectedSkill = null;
+  hideResult();
+  renderWorkflow();
+}
+
+function hideResult() {
+  const c = document.getElementById('result-card');
+  c.className = 'result-card';
+  c.innerHTML = '';
+}
+
+function checkAnswer() {
+  const s = SCENARIOS[currentScenario];
+  const current = slots[currentScenario];
+  if (current.some(v => v === null)) {
+    showResult('wrong', '<i class="ti ti-alert-circle"></i> Not complete yet',
+      'Please fill all ' + s.steps + ' steps before checking your answer.', null);
+    return;
+  }
+  const correct = current.every((v, i) => v === s.answer[i]);
+  if (correct) {
+    showResult('correct', '<i class="ti ti-circle-check"></i> Correct!',
+      'You identified the right skills in the right order. Here\'s why each step matters:', s.explanation);
+  } else {
+    const wrong = current.map((v, i) => v !== s.answer[i] ? (i + 1) : null).filter(v => v !== null);
+    showResult('wrong', '<i class="ti ti-alert-triangle"></i> Not quite',
+      'Step' + (wrong.length > 1 ? 's ' : ' ') + wrong.join(' and ') + ' need revisiting — re-read the skill descriptions in the catalog carefully.', null);
+  }
+}
+
+function revealAnswer() {
+  const s = SCENARIOS[currentScenario];
+  slots[currentScenario] = [...s.answer];
+  selectedSkill = null;
+  renderWorkflow();
+  showResult('reveal', '<i class="ti ti-eye"></i> Answer revealed',
+    'Here\'s the correct workflow and why each skill was chosen:', s.explanation);
+}
+
+function showResult(type, title, body, steps) {
+  const card = document.getElementById('result-card');
+  const cls = type === 'correct' ? 'res-correct' : type === 'wrong' ? 'res-wrong' : 'res-reveal';
+  let html = `<div class="res-title">${title}</div><div class="res-body">${body}</div>`;
+  if (steps) {
+    steps.forEach((exp, i) => {
+      html += `<div class="res-step"><span class="step-badge">${i + 1}</span><span>${exp}</span></div>`;
+    });
+  }
+  card.innerHTML = html;
+  card.className = `result-card show ${cls}`;
+}
+
+function renderCatalog() {
+  document.getElementById('catalog-grid').innerHTML = SKILLS.map((s, i) => `
+    <div class="skill-card">
+      <div class="skill-icon"><i class="ti ${s.icon}"></i></div>
+      <div>
+        <div class="skill-num">Skill ${String(i + 1).padStart(2, '0')}</div>
+        <div class="skill-name">${s.name}</div>
+        <div class="skill-desc">${s.desc}</div>
+      </div>
+    </div>`).join('');
+}
+
+function renderWorkflow() {
+  const sc = SCENARIOS[currentScenario];
+  const current = slots[currentScenario];
+  const placed = current.filter(v => v !== null);
+  const filled = placed.length;
+  const hasSelected = selectedSkill !== null;
+
+  document.getElementById('story-text').textContent = sc.story;
+
+  const instr = hasSelected
+    ? `<strong style="color:#185fa5;">Skill selected — click a step slot above to place it</strong>`
+    : filled === sc.steps
+    ? `<span style="color:#3b6d11; font-weight:500;">All ${sc.steps} steps filled</span> &nbsp;·&nbsp; check your answer below`
+    : `Click a skill to select it, then click a step slot to place it &nbsp;·&nbsp; <span style="color:#aaa;">${filled} / ${sc.steps} filled</span>`;
+  document.getElementById('instr-bar').innerHTML = instr;
+
+  let slotsHtml = '';
+  sc.stepLabels.forEach((label, i) => {
+    const placedId = current[i];
+    const skill = placedId ? SKILLS.find(s => s.id === placedId) : null;
+    let cls = 'step-slot';
+    if (placedId) cls += ' filled';
+    else if (hasSelected) cls += ' ready';
+    slotsHtml += `<div class="${cls}" onclick="placeInSlot(${i})" role="button" aria-label="Step ${i+1}: ${label}">
+      <div class="slot-num">Step ${i + 1}</div>
+      <div class="slot-label">${label}</div>
+      ${placedId
+        ? `<div class="slot-placed"><i class="ti ${skill.icon}" style="font-size:13px;"></i>${skill.name}</div>
+           <div class="slot-remove-hint">click to remove</div>`
+        : hasSelected
+          ? `<div class="slot-ready-hint">Place here →</div>`
+          : `<div class="slot-empty">empty</div>`
+      }
+    </div>`;
+    if (i < sc.steps - 1) {
+      slotsHtml += `<div class="arrow-sep"><i class="ti ti-arrow-right"></i></div>`;
+    }
+  });
+  document.getElementById('slots-row').innerHTML = slotsHtml;
+
+  document.getElementById('picker-grid').innerHTML = SKILLS.map(s => {
+    const isPlaced = placed.includes(s.id);
+    const isSel = selectedSkill === s.id;
+    let cls = 'skill-chip';
+    if (isSel) cls += ' selected';
+    if (isPlaced) cls += ' placed';
+    return `<button class="${cls}" onclick="selectSkill('${s.id}')">
+      <i class="ti ${s.icon}" style="font-size:14px;"></i>
+      <span>${s.name}</span>
+    </button>`;
+  }).join('');
+}
+
+renderCatalog();
+renderWorkflow();
+</script>
+</body>
+</html>

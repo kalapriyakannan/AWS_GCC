@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Insights Activity</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f3; color: #1a1a18; padding: 2rem; }
+.shell { max-width: 780px; margin: 0 auto; background: #fff; border-radius: 12px; padding: 1.5rem 2rem 2rem; border: 0.5px solid #ddd; }
+h1 { font-size: 20px; font-weight: 500; color: #1a1a18; margin-bottom: 4px; }
+
+.top-bar { display: flex; gap: 0; border-bottom: 0.5px solid #ddd; margin-bottom: 1.5rem; }
+.tab { padding: 10px 18px; font-size: 13px; cursor: pointer; border-bottom: 2px solid transparent; color: #888; background: none; border-top: none; border-left: none; border-right: none; font-family: inherit; display: flex; align-items: center; gap: 6px; }
+.tab.active { color: #1a1a18; border-bottom: 2px solid #1a1a18; font-weight: 500; }
+.tab:hover:not(.active) { color: #1a1a18; background: #f5f5f3; }
+.page { display: none; }
+.page.active { display: block; }
+
+.section-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #aaa; font-weight: 500; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.divider { border: none; border-top: 0.5px solid #eee; margin: 1.5rem 0; }
+
+/* Tables */
+.table-wrap { overflow-x: auto; margin-bottom: 1.5rem; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.data-table th { background: #1a1a18; color: #fff; padding: 9px 14px; text-align: left; font-weight: 500; font-size: 12px; white-space: nowrap; }
+.data-table th:first-child { border-radius: 6px 0 0 0; }
+.data-table th:last-child { border-radius: 0 6px 0 0; }
+.data-table td { padding: 9px 14px; border-bottom: 0.5px solid #eee; color: #333; white-space: nowrap; }
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:nth-child(even) td { background: #fafaf8; }
+.data-table tr:hover td { background: #f0f7ff; transition: background 0.1s; }
+.data-table td:first-child { font-weight: 500; color: #1a1a18; }
+.cell-up { color: #3b6d11; }
+.cell-down { color: #a32d2d; }
+.cell-warn { color: #854f0b; font-weight: 500; }
+.cell-star { color: #185fa5; font-weight: 500; }
+
+/* Question cards */
+.q-card { border: 0.5px solid #ddd; border-radius: 10px; padding: 1.25rem; margin-bottom: 14px; }
+.q-card.answered-correct { border-color: #c0dd97; background: #fafef4; }
+.q-card.answered-wrong { border-color: #fac775; background: #fffdf5; }
+.q-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+.q-num { font-size: 11px; font-weight: 500; color: #aaa; }
+.diff-badge { font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 20px; }
+.diff-easy { background: #eaf3de; color: #3b6d11; }
+.diff-medium { background: #faeeda; color: #854f0b; }
+.diff-hard { background: #fcebeb; color: #a32d2d; }
+.table-ref { font-size: 10px; color: #aaa; border: 0.5px solid #eee; padding: 2px 8px; border-radius: 20px; display: flex; align-items: center; gap: 4px; }
+.q-text { font-size: 14px; color: #1a1a18; line-height: 1.65; margin-bottom: 14px; }
+
+/* Radio options */
+.options { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.option-label { display: flex; align-items: flex-start; gap: 10px; padding: 9px 12px; border: 0.5px solid #ddd; border-radius: 8px; cursor: pointer; font-size: 13px; color: #333; line-height: 1.5; }
+.option-label:hover { background: #f5f5f3; border-color: #bbb; }
+.option-label input[type=radio] { margin-top: 2px; flex-shrink: 0; accent-color: #1a1a18; }
+.option-label.correct-choice { background: #eaf3de; border-color: #3b6d11; color: #1a1a18; }
+.option-label.wrong-choice { background: #fcebeb; border-color: #a32d2d; color: #1a1a18; }
+.option-label.reveal-correct { background: #eaf3de; border-color: #3b6d11; }
+
+/* Result */
+.q-result { display: none; font-size: 13px; padding: 10px 12px; border-radius: 8px; line-height: 1.6; margin-top: 10px; }
+.q-result.show { display: flex; gap: 8px; align-items: flex-start; }
+.q-result.res-correct { background: #eaf3de; color: #2a5a0a; }
+.q-result.res-wrong { background: #faeeda; color: #6a3a08; }
+.res-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+
+/* Q footer */
+.q-footer { display: flex; gap: 8px; align-items: center; }
+.btn { padding: 7px 14px; font-size: 12px; border-radius: 7px; border: 0.5px solid #ddd; cursor: pointer; font-family: inherit; background: #fff; color: #555; display: inline-flex; align-items: center; gap: 5px; }
+.btn:hover { background: #f5f5f3; }
+.btn-dark { background: #1a1a18; color: #fff; border-color: #1a1a18; }
+.btn-dark:hover { background: #333; }
+.btn-ghost { color: #555; }
+
+/* Score banner */
+.score-banner { border-radius: 10px; padding: 16px 20px; margin-top: 1.5rem; display: none; }
+.score-banner.show { display: flex; align-items: center; gap: 14px; }
+.score-num { font-size: 32px; font-weight: 500; line-height: 1; flex-shrink: 0; }
+.score-perfect { background: #eaf3de; color: #3b6d11; }
+.score-good { background: #e6f1fb; color: #185fa5; }
+.score-ok { background: #faeeda; color: #854f0b; }
+.score-retry { background: #f5f5f3; color: #555; }
+
+/* Debrief */
+.debrief { border-left: 2px solid #e9a800; border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; background: #fffdf5; margin-top: 1rem; }
+.debrief-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #854f0b; font-weight: 500; margin-bottom: 6px; display: flex; align-items: center; gap: 5px; }
+.debrief p { color: #854f0b; font-size: 13px; line-height: 1.65; }
+
+/* Data note */
+.data-note { font-size: 12px; color: #aaa; font-style: italic; margin-bottom: 1.25rem; }
+</style>
+</head>
+<body>
+<div class="shell">
+
+<div style="margin-bottom: 1.25rem;">
+  <h1>Data Insights Activity</h1>
+  <p style="font-size:13px; color:#888; margin-top:4px;">Study the three data tables, then switch to the Questions tab and answer in natural language — no spreadsheet tools allowed.</p>
+</div>
+
+<div class="top-bar">
+  <button class="tab active" onclick="showTab('data', this)"><i class="ti ti-table"></i> Data</button>
+  <button class="tab" onclick="showTab('questions', this)"><i class="ti ti-message-question"></i> Questions</button>
+</div>
+
+<!-- DATA TAB -->
+<div id="data" class="page active">
+  <p class="data-note">Fictional data for a global SaaS company — FY 2025. All figures are illustrative.</p>
+
+  <div class="section-label"><i class="ti ti-chart-line" style="font-size:13px;"></i> Table 1 — Quarterly revenue by region ($M)</div>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Region</th>
+          <th>Q1 2025</th>
+          <th>Q2 2025</th>
+          <th>Q3 2025</th>
+          <th>Q4 2025</th>
+          <th>Full Year</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>North America</td>
+          <td>$4.2M</td>
+          <td class="cell-up">$4.8M ↑</td>
+          <td class="cell-up">$5.1M ↑</td>
+          <td class="cell-down">$4.6M ↓</td>
+          <td>$18.7M</td>
+        </tr>
+        <tr>
+          <td>EMEA</td>
+          <td>$2.1M</td>
+          <td class="cell-up">$2.3M ↑</td>
+          <td class="cell-up">$2.8M ↑</td>
+          <td class="cell-up">$3.1M ↑</td>
+          <td>$10.3M</td>
+        </tr>
+        <tr>
+          <td>APAC</td>
+          <td>$1.4M</td>
+          <td class="cell-down">$1.3M ↓</td>
+          <td class="cell-up">$1.7M ↑</td>
+          <td class="cell-up">$2.2M ↑</td>
+          <td>$6.6M</td>
+        </tr>
+        <tr>
+          <td>LATAM</td>
+          <td>$0.8M</td>
+          <td class="cell-up">$0.9M ↑</td>
+          <td class="cell-down">$0.7M ↓</td>
+          <td class="cell-up">$1.0M ↑</td>
+          <td>$3.4M</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <hr class="divider">
+
+  <div class="section-label"><i class="ti ti-headset" style="font-size:13px;"></i> Table 2 — Q4 2025 customer support metrics by region</div>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Region</th>
+          <th>Tickets raised</th>
+          <th>Avg resolution (days)</th>
+          <th>CSAT score (/ 5)</th>
+          <th>SLA breaches</th>
+          <th>SLA breach rate</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>North America</td>
+          <td>342</td>
+          <td class="cell-star">1.8</td>
+          <td class="cell-star">4.6</td>
+          <td>12</td>
+          <td>3.5%</td>
+        </tr>
+        <tr>
+          <td>EMEA</td>
+          <td>218</td>
+          <td>2.4</td>
+          <td>4.3</td>
+          <td>8</td>
+          <td>3.7%</td>
+        </tr>
+        <tr>
+          <td>APAC</td>
+          <td>156</td>
+          <td class="cell-down">3.1</td>
+          <td class="cell-down">3.9</td>
+          <td class="cell-warn">21</td>
+          <td class="cell-warn">13.5%</td>
+        </tr>
+        <tr>
+          <td>LATAM</td>
+          <td>89</td>
+          <td>2.0</td>
+          <td>4.5</td>
+          <td class="cell-star">3</td>
+          <td class="cell-star">3.4%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <hr class="divider">
+
+  <div class="section-label"><i class="ti ti-users" style="font-size:13px;"></i> Table 3 — Headcount by region and function (Q4 2025)</div>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Region</th>
+          <th>Engineering</th>
+          <th>Sales</th>
+          <th>Support</th>
+          <th>Total headcount</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>North America</td>
+          <td>45</td>
+          <td>28</td>
+          <td>22</td>
+          <td>95</td>
+        </tr>
+        <tr>
+          <td>EMEA</td>
+          <td>18</td>
+          <td>15</td>
+          <td>12</td>
+          <td>45</td>
+        </tr>
+        <tr>
+          <td>APAC</td>
+          <td>12</td>
+          <td>10</td>
+          <td>14</td>
+          <td>36</td>
+        </tr>
+        <tr>
+          <td>LATAM</td>
+          <td>5</td>
+          <td>7</td>
+          <td>6</td>
+          <td>18</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- QUESTIONS TAB -->
+<div id="questions" class="page">
+  <p style="font-size:13px; color:#888; margin-bottom:1.25rem;">Answer each question by reading the data tables. Select your answer, then click <strong style="color:#1a1a18;">Check</strong>. All questions are based on the three tables in the Data tab.</p>
+
+  <div id="q-cards"></div>
+
+  <div style="display:flex; gap:8px; justify-content:flex-end; margin-bottom:1rem;">
+    <button class="btn btn-ghost" onclick="resetAll()"><i class="ti ti-refresh"></i> Reset all</button>
+    <button class="btn btn-dark" onclick="checkAll()"><i class="ti ti-list-check"></i> Check all answers</button>
+  </div>
+
+  <div class="score-banner" id="score-banner"></div>
+
+  <div class="debrief" style="margin-top:1.25rem;">
+    <div class="debrief-label"><i class="ti ti-bulb" style="font-size:14px;"></i> Debrief prompt</div>
+    <p>You just experienced the <strong>Discover</strong> challenge of extracting insights from raw tabular data — finding patterns, computing ratios, and cross-referencing across three tables. Each answer required careful scanning, mental calculation, or synthesis. How much faster could this analysis happen if a colleague could ask these questions in plain English and get the answer instantly?</p>
+  </div>
+</div>
+
+</div>
+<script>
+const QUESTIONS = [
+  {
+    id: 'q1',
+    difficulty: 'Easy',
+    diffClass: 'diff-easy',
+    tableRef: 'Table 1 — Revenue',
+    text: 'Which region was the only one to grow revenue every single quarter throughout 2025, with absolutely no decline at any point during the year?',
+    options: [
+      { id: 'na',    label: 'North America — grew Q1 to Q3, then dipped in Q4' },
+      { id: 'emea',  label: 'EMEA — grew every single quarter: $2.1M → $2.3M → $2.8M → $3.1M' },
+      { id: 'apac',  label: 'APAC — grew most quarters but dipped in Q2' },
+      { id: 'latam', label: 'LATAM — grew most quarters but dipped in Q3' },
+    ],
+    answer: 'emea',
+    explanation: 'EMEA is the only region with uninterrupted growth: $2.1M → $2.3M → $2.8M → $3.1M. NA peaked in Q3 then fell in Q4. APAC dipped from $1.4M to $1.3M in Q2. LATAM dropped from $0.9M to $0.7M in Q3.'
+  },
+  {
+    id: 'q2',
+    difficulty: 'Easy',
+    diffClass: 'diff-easy',
+    tableRef: 'Table 2 — Support',
+    text: 'Which region resolved customer support tickets fastest on average in Q4 2025?',
+    options: [
+      { id: 'na',    label: 'North America — average 1.8 days per ticket' },
+      { id: 'emea',  label: 'EMEA — average 2.4 days per ticket' },
+      { id: 'apac',  label: 'APAC — average 3.1 days per ticket' },
+      { id: 'latam', label: 'LATAM — average 2.0 days per ticket' },
+    ],
+    answer: 'na',
+    explanation: 'North America resolved tickets in 1.8 days on average — the fastest of all regions. LATAM was close at 2.0 days, while APAC was slowest at 3.1 days.'
+  },
+  {
+    id: 'q3',
+    difficulty: 'Medium',
+    diffClass: 'diff-medium',
+    tableRef: 'Tables 2 + 3 — Support + Headcount',
+    text: 'LATAM has the smallest support team. Despite this, what is remarkable about their Q4 customer satisfaction score compared to other regions?',
+    options: [
+      { id: 'a', label: 'LATAM has the highest CSAT score of all regions (4.5 beats NA\'s 4.6) — False, NA leads' },
+      { id: 'b', label: 'LATAM\'s 6 support staff deliver the second-highest CSAT (4.5), ahead of EMEA (4.3) and APAC (3.9) with larger teams' },
+      { id: 'c', label: 'LATAM\'s CSAT is below average because their team is too small to handle demand' },
+      { id: 'd', label: 'LATAM\'s CSAT matches EMEA\'s despite having half the support headcount' },
+    ],
+    answer: 'b',
+    explanation: 'LATAM runs just 6 support staff yet scores 4.5/5 in CSAT — second only to NA (4.6 with 22 staff). EMEA (12 staff) scores only 4.3 and APAC (14 staff) scores a low 3.9. LATAM is a standout efficiency story.'
+  },
+  {
+    id: 'q4',
+    difficulty: 'Medium',
+    diffClass: 'diff-medium',
+    tableRef: 'Table 2 — Support',
+    text: 'The SLA breach rate for one region is dramatically higher than the rest. Which region is it, and how does its rate compare to the next worst?',
+    options: [
+      { id: 'a', label: 'NA at 3.5% — slightly above average but manageable' },
+      { id: 'b', label: 'EMEA at 3.7% — marginally the worst of the four' },
+      { id: 'c', label: 'APAC at 13.5% — nearly 4× higher than the next worst region (EMEA at 3.7%)' },
+      { id: 'd', label: 'LATAM at 3.4% — lowest breach rate, so no concern here' },
+    ],
+    answer: 'c',
+    explanation: 'APAC\'s SLA breach rate is 21 ÷ 156 tickets = 13.5%. The next worst is EMEA at 8 ÷ 218 = 3.7%. APAC is nearly 4× worse — a clear outlier that warrants an executive conversation about capacity or process issues in that region.'
+  },
+  {
+    id: 'q5',
+    difficulty: 'Hard',
+    diffClass: 'diff-hard',
+    tableRef: 'Tables 1 + 3 — Revenue + Headcount',
+    text: 'Looking at Q4 2025 revenue per total employee, which region generates the most value per head — even though it is not the absolute top revenue generator?',
+    options: [
+      { id: 'na',    label: 'North America — $4.6M ÷ 95 people ≈ $48K/person' },
+      { id: 'emea',  label: 'EMEA — $3.1M ÷ 45 people ≈ $69K/person' },
+      { id: 'apac',  label: 'APAC — $2.2M ÷ 36 people ≈ $61K/person' },
+      { id: 'latam', label: 'LATAM — $1.0M ÷ 18 people ≈ $56K/person' },
+    ],
+    answer: 'emea',
+    explanation: 'EMEA generates ~$68.9K per employee in Q4, the highest of all four regions — despite ranking second in absolute revenue. NA generates only ~$48.4K/person. This suggests EMEA is the most capital-efficient operation and could be a model for scaling.'
+  },
+  {
+    id: 'q6',
+    difficulty: 'Hard',
+    diffClass: 'diff-hard',
+    tableRef: 'All three tables',
+    text: 'A new CRO asks you to flag one region showing compounding risk signals across all data: a quarterly revenue dip at some point in 2025, the worst customer satisfaction score, and the highest SLA failure rate. Which region fits all three criteria?',
+    options: [
+      { id: 'na',    label: 'North America — strong performer overall, Q4 revenue dip but leads on CSAT' },
+      { id: 'emea',  label: 'EMEA — consistent revenue growth and mid-tier support metrics' },
+      { id: 'apac',  label: 'APAC — Q2 revenue dip ($1.4M → $1.3M), worst CSAT (3.9/5), highest SLA breach rate (13.5%)' },
+      { id: 'latam', label: 'LATAM — Q3 revenue dip but strong CSAT (4.5) and low breach rate (3.4%)' },
+    ],
+    answer: 'apac',
+    explanation: 'APAC checks every risk box: revenue dipped Q1→Q2 ($1.4M → $1.3M), lowest CSAT at 3.9/5, and a 13.5% SLA breach rate — nearly 4× the next worst region. This is the region that most urgently needs a leadership review and operational intervention.'
+  }
+];
+
+let userAnswers = {};
+
+function showTab(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function checkQuestion(qId, reveal) {
+  const q = QUESTIONS.find(q => q.id === qId);
+  const selected = userAnswers[qId];
+  const card = document.getElementById('card-' + qId);
+  const resultEl = document.getElementById('result-' + qId);
+
+  if (!reveal && !selected) {
+    resultEl.innerHTML = '<i class="ti ti-alert-circle res-icon"></i><span>Please select an answer first.</span>';
+    resultEl.className = 'q-result show res-wrong';
+    return;
+  }
+
+  const chosenId = reveal ? null : selected;
+  const isCorrect = chosenId === q.answer;
+
+  q.options.forEach(opt => {
+    const lbl = document.getElementById('lbl-' + qId + '-' + opt.id);
+    if (lbl) {
+      lbl.classList.remove('correct-choice', 'wrong-choice', 'reveal-correct');
+      if (opt.id === q.answer) {
+        lbl.classList.add(reveal ? 'reveal-correct' : 'correct-choice');
+      } else if (!reveal && opt.id === chosenId) {
+        lbl.classList.add('wrong-choice');
+      }
+    }
+  });
+
+  if (reveal) {
+    resultEl.innerHTML = `<i class="ti ti-eye res-icon"></i><span><strong>Answer:</strong> ${q.explanation}</span>`;
+    resultEl.className = 'q-result show res-wrong';
+    card.className = 'q-card answered-wrong';
+  } else if (isCorrect) {
+    resultEl.innerHTML = `<i class="ti ti-circle-check res-icon"></i><span><strong>Correct!</strong> ${q.explanation}</span>`;
+    resultEl.className = 'q-result show res-correct';
+    card.className = 'q-card answered-correct';
+  } else {
+    resultEl.innerHTML = `<i class="ti ti-alert-triangle res-icon"></i><span><strong>Not quite.</strong> ${q.explanation}</span>`;
+    resultEl.className = 'q-result show res-wrong';
+    card.className = 'q-card answered-wrong';
+  }
+}
+
+function checkAll() {
+  QUESTIONS.forEach(q => checkQuestion(q.id, false));
+  const answered = QUESTIONS.filter(q => userAnswers[q.id]);
+  const correct = QUESTIONS.filter(q => userAnswers[q.id] === q.answer).length;
+  showScore(correct, answered.length);
+}
+
+function showScore(correct, answered) {
+  const banner = document.getElementById('score-banner');
+  const total = QUESTIONS.length;
+  let cls, msg;
+  if (correct === total) {
+    cls = 'score-perfect';
+    msg = '<strong>Perfect score!</strong> You read the data like a seasoned analyst. Every insight was found correctly.';
+  } else if (correct >= 4) {
+    cls = 'score-good';
+    msg = `<strong>Strong read.</strong> You caught ${correct} of ${total} insights. One or two slipped by — worth a second look at the tables.`;
+  } else if (correct >= 2) {
+    cls = 'score-ok';
+    msg = `<strong>Good effort.</strong> ${correct} of ${total} correct. Some questions required cross-referencing tables — try revisiting the harder ones.`;
+  } else {
+    cls = 'score-retry';
+    msg = `<strong>${correct} of ${total}.</strong> The data tells a rich story — try working through the table references in each question hint.`;
+  }
+  banner.innerHTML = `
+    <div class="score-num">${correct}/${total}</div>
+    <div style="font-size:14px; line-height:1.6;">${msg}</div>`;
+  banner.className = `score-banner show ${cls}`;
+  banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function resetAll() {
+  userAnswers = {};
+  document.getElementById('score-banner').className = 'score-banner';
+  renderQuestions();
+}
+
+function renderQuestions() {
+  const container = document.getElementById('q-cards');
+  container.innerHTML = QUESTIONS.map((q, i) => `
+    <div class="q-card" id="card-${q.id}">
+      <div class="q-header">
+        <span class="q-num">Question ${i + 1} of ${QUESTIONS.length}</span>
+        <span class="diff-badge ${q.diffClass}">${q.difficulty}</span>
+        <span class="table-ref"><i class="ti ti-table" style="font-size:10px;"></i> ${q.tableRef}</span>
+      </div>
+      <div class="q-text">${q.text}</div>
+      <div class="options">
+        ${q.options.map(opt => `
+          <label class="option-label" id="lbl-${q.id}-${opt.id}">
+            <input type="radio" name="${q.id}" value="${opt.id}" onchange="userAnswers['${q.id}'] = '${opt.id}'">
+            <span>${opt.label}</span>
+          </label>`).join('')}
+      </div>
+      <div class="q-footer">
+        <button class="btn btn-dark" onclick="checkQuestion('${q.id}', false)"><i class="ti ti-check"></i> Check</button>
+        <button class="btn btn-ghost" onclick="checkQuestion('${q.id}', true)"><i class="ti ti-eye"></i> Reveal</button>
+      </div>
+      <div class="q-result" id="result-${q.id}"></div>
+    </div>
+  `).join('');
+}
+
+renderQuestions();
+</script>
+</body>
+</html>

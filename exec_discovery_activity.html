@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Executive Discovery Activity — PulseApp</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f3; color: #1a1a18; padding: 2rem; }
+.shell { max-width: 720px; margin: 0 auto; background: #fff; border-radius: 12px; padding: 1.5rem 2rem; border: 0.5px solid #ddd; }
+.top-bar { display: flex; gap: 0; border-bottom: 0.5px solid #ddd; margin-bottom: 1.5rem; }
+.tab { padding: 10px 18px; font-size: 13px; cursor: pointer; border-bottom: 2px solid transparent; color: #888; background: none; border-top: none; border-left: none; border-right: none; font-family: inherit; display: flex; align-items: center; gap: 6px; }
+.tab.active { color: #1a1a18; border-bottom: 2px solid #1a1a18; font-weight: 500; }
+.tab:hover:not(.active) { color: #1a1a18; background: #f5f5f3; }
+.page { display: none; }
+.page.active { display: block; }
+.badge { font-size: 11px; padding: 2px 8px; border-radius: 6px; font-weight: 500; }
+.badge-blue { background: #e6f1fb; color: #185fa5; }
+.badge-green { background: #eaf3de; color: #3b6d11; }
+.badge-amber { background: #faeeda; color: #854f0b; }
+.card { background: #fff; border: 0.5px solid #ddd; border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 12px; }
+.section-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #aaa; font-weight: 500; margin-bottom: 8px; }
+.mono { font-family: 'Menlo', 'Consolas', monospace; font-size: 12px; background: #f5f5f3; padding: 10px 12px; border-radius: 8px; border: 0.5px solid #ddd; line-height: 1.6; color: #1a1a18; }
+.mono .comment { color: #aaa; }
+.mono .keyword { color: #185fa5; }
+.mono .string { color: #3b6d11; }
+.person-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 0.5px solid #eee; }
+.person-row:last-child { border-bottom: none; }
+.avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; flex-shrink: 0; }
+.av-blue { background: #e6f1fb; color: #185fa5; }
+.av-teal { background: #e1f5ee; color: #0f6e56; }
+.av-amber { background: #faeeda; color: #854f0b; }
+.av-purple { background: #eeedfe; color: #534ab7; }
+.q-card { background: #fff; border: 0.5px solid #ddd; border-radius: 10px; padding: 1.25rem; margin-bottom: 16px; }
+.q-num { font-size: 11px; font-weight: 500; color: #aaa; margin-bottom: 6px; }
+.q-text { font-size: 15px; color: #1a1a18; line-height: 1.6; margin-bottom: 12px; }
+.hint-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.hint-chip { font-size: 11px; padding: 3px 10px; border-radius: 20px; border: 0.5px solid #ddd; color: #888; display: flex; align-items: center; gap: 4px; }
+.divider { border: none; border-top: 0.5px solid #eee; margin: 1rem 0; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.layer-row { display: grid; grid-template-columns: 90px 1fr; gap: 10px; align-items: start; margin-bottom: 10px; }
+.layer-pill { font-size: 11px; font-weight: 500; padding: 4px 10px; border-radius: 20px; text-align: center; }
+h1 { font-size: 20px; font-weight: 500; color: #1a1a18; margin-bottom: 6px; }
+h2 { font-size: 16px; font-weight: 500; color: #1a1a18; margin-bottom: 12px; }
+h3 { font-size: 14px; font-weight: 500; color: #1a1a18; margin-bottom: 6px; }
+p { font-size: 13px; color: #555; line-height: 1.6; margin-bottom: 8px; }
+.file-tree { font-family: 'Menlo', 'Consolas', monospace; font-size: 12px; color: #888; line-height: 1.8; }
+.file-tree .folder { color: #1a1a18; font-weight: 500; }
+.file-tree .active-file { color: #185fa5; cursor: pointer; text-decoration: underline; }
+.code-block { display: none; }
+.code-block.visible { display: block; }
+.api-row { display: flex; align-items: center; gap: 8px; padding: 7px 0; border-bottom: 0.5px solid #eee; font-size: 13px; }
+.api-row:last-child { border-bottom: none; }
+.method { font-family: 'Menlo', 'Consolas', monospace; font-size: 11px; font-weight: 500; padding: 2px 6px; border-radius: 4px; min-width: 44px; text-align: center; }
+.get { background: #eaf3de; color: #3b6d11; }
+.post { background: #e6f1fb; color: #185fa5; }
+.del { background: #fcebeb; color: #a32d2d; }
+.endpoint { font-family: 'Menlo', 'Consolas', monospace; font-size: 12px; color: #1a1a18; flex: 1; }
+.owner { font-size: 11px; color: #aaa; }
+.notice { background: #faeeda; border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #854f0b; display: flex; align-items: flex-start; gap: 8px; margin-bottom: 1rem; }
+.answer-box { margin-top: 12px; padding: 10px 12px; background: #f5f5f3; border-radius: 8px; font-size: 12px; color: #aaa; font-style: italic; min-height: 48px; }
+.debrief { background: #fff; border-left: 2px solid #e9a800; border-radius: 0 8px 8px 0; padding: 1rem 1.25rem; margin-top: 1rem; }
+</style>
+</head>
+<body>
+<div class="shell">
+
+<div style="margin-bottom: 1.5rem;">
+  <h1>Paradox of Distributed Knowledge</h1>
+  <p style="margin-bottom:0;">Explore the three artifact tabs below, then answer the questions on the last tab. The challenge: information is <em>distributed</em> — no single artifact has the full picture.</p>
+</div>
+
+<div class="top-bar">
+  <button class="tab active" onclick="showTab('wiki', this)"><i class="ti ti-book"></i> Wiki</button>
+  <button class="tab" onclick="showTab('github', this)"><i class="ti ti-brand-github"></i> GitHub</button>
+  <button class="tab" onclick="showTab('gdoc', this)"><i class="ti ti-file-description"></i> Google Doc</button>
+  <button class="tab" onclick="showTab('questions', this)"><i class="ti ti-help-circle"></i> Questions</button>
+</div>
+
+<!-- WIKI -->
+<div id="wiki" class="page active">
+  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+    <i class="ti ti-book" style="font-size:18px; color:#888;"></i>
+    <span style="font-size: 11px; color: #aaa;">Internal Wiki / Engineering</span>
+    <span style="font-size: 11px; color: #aaa;">/</span>
+    <span style="font-size: 11px; color: #1a1a18;">PulseApp</span>
+    <span class="badge badge-blue" style="margin-left:auto;">v2.1</span>
+  </div>
+
+  <h2>PulseApp — web application tech stack &amp; project description</h2>
+  <p>PulseApp is an internal analytics dashboard that aggregates real-time operational metrics for business unit leaders. It is built on a three-layer architecture.</p>
+
+  <hr class="divider">
+  <div class="section-label">Architecture overview</div>
+  <div style="margin-bottom: 16px;">
+    <div class="layer-row">
+      <div class="layer-pill" style="background:#eeedfe; color:#534ab7;">Presentation</div>
+      <div><h3>React 18 + TypeScript</h3><p>Single-page application hosted on Vercel. Uses Recharts for data visualisation and Tailwind CSS for styling. Communicates exclusively via REST calls to the middle layer.</p></div>
+    </div>
+    <div class="layer-row">
+      <div class="layer-pill" style="background:#e6f1fb; color:#185fa5;">Middle layer</div>
+      <div><h3>Node.js / Express API</h3><p>Stateless REST API. Handles authentication (JWT), request validation, business logic, and data aggregation before passing results to the frontend. Deployed on AWS ECS.</p></div>
+    </div>
+    <div class="layer-row">
+      <div class="layer-pill" style="background:#e1f5ee; color:#0f6e56;">Backend</div>
+      <div><h3>PostgreSQL 15 + Redis 7</h3><p>PostgreSQL stores transactional and user data. Redis is used as a caching layer for metric queries with a 5-minute TTL to reduce database load.</p></div>
+    </div>
+  </div>
+
+  <hr class="divider">
+  <div class="section-label">Key design decisions</div>
+  <div class="card">
+    <p style="margin-bottom: 4px;"><strong style="font-weight:500;">Authentication model:</strong> JWT tokens issued by the middle layer with a 1-hour expiry. Refresh tokens stored in Redis.</p>
+    <p style="margin-bottom: 4px;"><strong style="font-weight:500;">Data access:</strong> All database queries go through the API — the frontend never talks directly to PostgreSQL.</p>
+    <p style="margin-bottom: 0;"><strong style="font-weight:500;">Caching strategy:</strong> Metric aggregation queries are expensive. Results cached per user in Redis keyed by <code style="font-family:monospace;font-size:12px;">metrics:{userId}:{date}</code>.</p>
+  </div>
+
+  <hr class="divider">
+  <div class="section-label">Repository &amp; deployment</div>
+  <div class="two-col">
+    <div class="card" style="margin-bottom:0;"><p style="font-size:12px; color:#aaa; margin-bottom:2px;">GitHub repo</p><p style="font-size:13px; color:#1a1a18; margin-bottom:0; font-family:monospace;">intuit-internal/pulseapp</p></div>
+    <div class="card" style="margin-bottom:0;"><p style="font-size:12px; color:#aaa; margin-bottom:2px;">Production URL</p><p style="font-size:13px; color:#1a1a18; margin-bottom:0; font-family:monospace;">pulse.intuit.internal</p></div>
+  </div>
+</div>
+
+<!-- GITHUB -->
+<div id="github" class="page">
+  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+    <i class="ti ti-brand-github" style="font-size:18px; color:#888;"></i>
+    <span style="font-size: 13px; font-weight: 500; color:#1a1a18;">intuit-internal / pulseapp</span>
+    <span class="badge badge-green" style="margin-left: auto;">main</span>
+  </div>
+
+  <div class="two-col" style="align-items: start;">
+    <div>
+      <div class="section-label">File tree</div>
+      <div class="card" style="margin-bottom:0;">
+        <div class="file-tree">
+          <div class="folder">📁 pulseapp/</div>
+          <div style="padding-left:14px;">
+            <div class="active-file" onclick="showCode('readme')">📄 README.md</div>
+            <div class="folder">📁 api/</div>
+            <div style="padding-left:14px;">
+              <div class="active-file" onclick="showCode('routes')">📄 metricsRoutes.js</div>
+              <div class="active-file" onclick="showCode('auth')">📄 authMiddleware.js</div>
+            </div>
+            <div class="folder">📁 frontend/src/</div>
+            <div style="padding-left:14px;">
+              <div class="active-file" onclick="showCode('dashboard')">📄 Dashboard.tsx</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="section-label">Click a file to view</div>
+
+      <div id="code-readme" class="code-block visible">
+        <div class="card" style="margin-bottom:0; padding: 10px 12px;">
+          <p style="font-size:12px; font-weight:500; margin-bottom: 6px; color:#1a1a18;">README.md</p>
+          <div style="font-size:12px; line-height:1.7; color:#555;">
+            <p style="font-family:monospace; font-size:12px; color:#1a1a18; margin-bottom:6px;"># PulseApp API</p>
+            <p>Three files cover the core server logic:</p>
+            <p><code style="font-family:monospace; font-size:11px;">metricsRoutes.js</code> — all metric endpoints. Owner: <strong style="font-weight:500; color:#1a1a18;">Priya S.</strong></p>
+            <p><code style="font-family:monospace; font-size:11px;">authMiddleware.js</code> — JWT validation on every request.</p>
+            <p><code style="font-family:monospace; font-size:11px;">Dashboard.tsx</code> — primary React view, calls <code style="font-family:monospace; font-size:11px;">/api/metrics</code>.</p>
+            <p style="margin-bottom:0;">Run locally: <code style="font-family:monospace; font-size:11px;">npm install &amp;&amp; npm run dev</code></p>
+          </div>
+        </div>
+      </div>
+
+      <div id="code-routes" class="code-block">
+        <div class="mono">
+<span class="comment">// metricsRoutes.js — middle layer</span>
+<span class="keyword">const</span> router = require(<span class="string">'express'</span>).Router();
+<span class="keyword">const</span> cache = require(<span class="string">'./redisCache'</span>);
+
+router.get(<span class="string">'/api/metrics'</span>, auth, <span class="keyword">async</span> (req, res) => {
+  <span class="keyword">const</span> key = <span class="string">`metrics:${req.user.id}:today`</span>;
+  <span class="keyword">const</span> cached = <span class="keyword">await</span> cache.get(key);
+  <span class="keyword">if</span> (cached) <span class="keyword">return</span> res.json(cached);
+  <span class="keyword">const</span> data = <span class="keyword">await</span> db.query(<span class="string">'SELECT ...'</span>);
+  cache.set(key, data, <span class="string">'EX'</span>, 300);
+  res.json(data);
+});
+
+router.post(<span class="string">'/api/metrics/export'</span>, auth, ...);
+router.delete(<span class="string">'/api/metrics/cache'</span>, adminOnly, ...);
+
+module.exports = router;
+        </div>
+      </div>
+
+      <div id="code-auth" class="code-block">
+        <div class="mono">
+<span class="comment">// authMiddleware.js</span>
+<span class="keyword">const</span> jwt = require(<span class="string">'jsonwebtoken'</span>);
+
+<span class="keyword">function</span> auth(req, res, next) {
+  <span class="keyword">const</span> token = req.headers[<span class="string">'authorization'</span>]
+    ?.split(<span class="string">' '</span>)[1];
+  <span class="keyword">if</span> (!token) <span class="keyword">return</span> res.status(401).json({
+    error: <span class="string">'Unauthorized'</span>
+  });
+  <span class="keyword">try</span> {
+    req.user = jwt.verify(token, process.env.JWT_SECRET);
+    next();
+  } <span class="keyword">catch</span> {
+    res.status(403).json({ error: <span class="string">'Invalid token'</span> });
+  }
+}
+
+module.exports = { auth };
+        </div>
+      </div>
+
+      <div id="code-dashboard" class="code-block">
+        <div class="mono">
+<span class="comment">// Dashboard.tsx — presentation layer</span>
+<span class="keyword">import</span> { useEffect, useState } from <span class="string">'react'</span>;
+
+<span class="keyword">export default function</span> Dashboard() {
+  <span class="keyword">const</span> [metrics, setMetrics] = useState(null);
+
+  useEffect(() => {
+    fetch(<span class="string">'/api/metrics'</span>, {
+      headers: { Authorization: <span class="string">`Bearer ${token}`</span> }
+    })
+    .then(r => r.json())
+    .then(setMetrics);
+  }, []);
+
+  <span class="keyword">return</span> &lt;MetricsGrid data={metrics} /&gt;;
+}
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- GOOGLE DOC -->
+<div id="gdoc" class="page">
+  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+    <i class="ti ti-file-description" style="font-size:18px; color:#888;"></i>
+    <span style="font-size: 13px; font-weight: 500; color:#1a1a18;">PulseApp — project brief</span>
+    <span class="badge badge-amber" style="margin-left:auto;">Last edited Jun 9</span>
+  </div>
+
+  <div class="section-label">Project overview</div>
+  <div class="card">
+    <p><strong style="font-weight:500;">Purpose:</strong> Provide business unit leaders with a single pane of glass for operational KPIs — replacing three separate spreadsheets that Finance, Ops, and HR maintained independently.</p>
+    <p style="margin-bottom:0;"><strong style="font-weight:500;">Status:</strong> Production. 180 active users across 6 business units.</p>
+  </div>
+
+  <div class="section-label">Team</div>
+  <div class="card" style="padding: 0.75rem 1rem;">
+    <div class="person-row"><div class="avatar av-blue">PS</div><div style="flex:1;"><p style="font-size:13px; margin:0; color:#1a1a18;">Priya S.</p><p style="font-size:11px; margin:0;">Tech lead — API &amp; backend</p></div><span class="badge badge-blue">Lead</span></div>
+    <div class="person-row"><div class="avatar av-teal">MK</div><div style="flex:1;"><p style="font-size:13px; margin:0; color:#1a1a18;">Marco K.</p><p style="font-size:11px; margin:0;">Frontend engineer</p></div></div>
+    <div class="person-row"><div class="avatar av-purple">AS</div><div style="flex:1;"><p style="font-size:13px; margin:0; color:#1a1a18;">Anika S.</p><p style="font-size:11px; margin:0;">Product manager</p></div></div>
+    <div class="person-row"><div class="avatar av-amber">RN</div><div style="flex:1;"><p style="font-size:13px; margin:0; color:#1a1a18;">Raj N.</p><p style="font-size:11px; margin:0;">Data engineer — PostgreSQL schema</p></div></div>
+  </div>
+
+  <div class="section-label">Users &amp; access</div>
+  <div class="card">
+    <p><strong style="font-weight:500;">Primary users:</strong> Business unit leaders, Finance analysts, Ops managers.</p>
+    <p style="margin-bottom:0;"><strong style="font-weight:500;">Onboarding:</strong> New users request access via the IT portal. <em>There is no self-serve sign-up.</em> Average time from request to first login: <strong style="font-weight:500; color:#1a1a18;">4–6 business days.</strong></p>
+  </div>
+
+  <div class="section-label">API contracts</div>
+  <div class="card" style="padding: 0.75rem 1rem;">
+    <div class="api-row"><span class="method get">GET</span><span class="endpoint">/api/metrics</span><span class="owner">Owner: Priya S.</span></div>
+    <div class="api-row"><span class="method post">POST</span><span class="endpoint">/api/metrics/export</span><span class="owner">Owner: Priya S.</span></div>
+    <div class="api-row"><span class="method del">DEL</span><span class="endpoint">/api/metrics/cache</span><span class="owner">Admin only</span></div>
+    <div class="api-row"><span class="method get">GET</span><span class="endpoint">/api/users/me</span><span class="owner">Owner: Marco K.</span></div>
+  </div>
+
+  <div class="section-label">Known issues</div>
+  <div class="notice">
+    <i class="ti ti-alert-triangle" style="font-size:15px; flex-shrink:0; margin-top:1px;"></i>
+    <span>Redis cache is not invalidated when source data is updated mid-day. Users may see stale metrics for up to 5 minutes.</span>
+  </div>
+</div>
+
+<!-- QUESTIONS -->
+<div id="questions" class="page">
+  <div style="margin-bottom: 1rem;">
+    <div style="display:flex; align-items:center; gap:8px; margin-bottom: 6px;">
+      <i class="ti ti-compass" style="font-size:18px; color:#888;"></i>
+      <span style="font-size:15px; font-weight:500; color:#1a1a18;">Discovery challenge</span>
+    </div>
+    <p>Answers are not on this page. You must explore the Wiki, GitHub, and Google Doc tabs to find them. Use the hint chips for guidance on where to look.</p>
+  </div>
+
+  <div class="q-card">
+    <div class="q-num">Question 1 of 2</div>
+    <div class="q-text">Your team reports that a new VP needs access to PulseApp urgently. You want to understand: <strong style="font-weight:500;">who owns the endpoint her dashboard calls, what is it, and how long will she wait before she can log in for the first time?</strong></div>
+    <div class="hint-row">
+      <span class="hint-chip"><i class="ti ti-brand-github" style="font-size:12px;"></i> GitHub → README</span>
+      <span class="hint-chip"><i class="ti ti-brand-github" style="font-size:12px;"></i> GitHub → metricsRoutes.js</span>
+      <span class="hint-chip"><i class="ti ti-file-description" style="font-size:12px;"></i> Google Doc → Users</span>
+    </div>
+    <div class="answer-box">Write your answer here or discuss with your group. Note which artifact(s) you used.</div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-num">Question 2 of 2</div>
+    <div class="q-text">A business leader complains that "the numbers look wrong sometimes." Based on the system design, <strong style="font-weight:500;">identify the technical root cause and name the engineer best positioned to fix it.</strong></div>
+    <div class="hint-row">
+      <span class="hint-chip"><i class="ti ti-book" style="font-size:12px;"></i> Wiki → Key design decisions</span>
+      <span class="hint-chip"><i class="ti ti-brand-github" style="font-size:12px;"></i> GitHub → metricsRoutes.js</span>
+      <span class="hint-chip"><i class="ti ti-file-description" style="font-size:12px;"></i> Google Doc → Known issues + Team</span>
+    </div>
+    <div class="answer-box">Write your answer here or discuss with your group. Note which artifact(s) you used.</div>
+  </div>
+
+  <hr class="divider">
+  <div class="debrief">
+    <p style="font-size:13px; font-weight:500; color:#854f0b; margin-bottom:4px;"><i class="ti ti-bulb" style="font-size:14px; vertical-align:-1px;"></i> Debrief prompt</p>
+    <p style="margin-bottom:0; color:#854f0b;">You just experienced the <strong style="font-weight:500;">Discover</strong> challenge. Information critical to a business decision was split across three separate tools (Wiki, GitHub, Google Doc). How does this friction affect decision speed in your own organisation?</p>
+  </div>
+</div>
+
+</div>
+
+<script>
+function showTab(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+function showCode(name) {
+  document.querySelectorAll('.code-block').forEach(b => b.classList.remove('visible'));
+  document.getElementById('code-' + name).classList.add('visible');
+}
+</script>
+</body>
+</html>
